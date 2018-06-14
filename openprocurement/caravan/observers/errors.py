@@ -1,0 +1,4 @@
+# -*- coding: utf-8 -*-
+
+CONTRACT_NOT_FOUND = 1
+CONTRACT_ALREADY_TERMINATED = 2
