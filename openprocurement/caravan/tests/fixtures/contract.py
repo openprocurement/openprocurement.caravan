@@ -72,7 +72,7 @@ def interconnect_contract_with_lot(contract_id, lot_id, db):
     contract = db[contract_id]
     lot = db[lot_id]
 
-    lot['contracts'][0]['id'] = contract_id
+    lot['contracts'][0]['relatedProcessID'] = contract_id
     db.save(lot)
 
     contract['merchandisingObject'] = lot_id

@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 from openprocurement.caravan.observers.base_observer import (
+    BaseObserverObservable,
     ObserverObservableWithClient,
 )
 from openprocurement.caravan.constants import (
     CONTRACT_STATUS_MAPPING,
+    LOT_CONTRACT_TERMINAL_STATUSES,
+)
+from openprocurement.caravan.utils import (
+    LOGGER,
+    search_lot_contract_by_related_contract,
 )
 
 
@@ -20,14 +26,16 @@ class LotContractChecker(ObserverObservableWithClient):
         self._notify_observers(result)
 
     def _check_lot_contract(self, message):
-        return self.client.get_contract(
+        return search_lot_contract_by_related_contract(
+            self.client,
             message['lot_id'],
             message['contract_id']
         )
 
     def _prepare_message(self, lot_contract, recv_message):
         recv_message.update({
-            'lot_contract_status': lot_contract.data.status
+            'lot_contract_status': lot_contract.status,
+            'lot_contract_id': lot_contract.id
         })
         return recv_message
 
@@ -35,7 +43,10 @@ class LotContractChecker(ObserverObservableWithClient):
 class LotContractPatcher(ObserverObservableWithClient):
 
     def _activate(self, message):
-        if not message.get('error'):
+        if (
+            not message.get('error')
+            and not (message['lot_contract_status'] in LOT_CONTRACT_TERMINAL_STATUSES)  # skip already finished contracts
+        ):
             return True
 
     def _run(self, message):
@@ -47,7 +58,7 @@ class LotContractPatcher(ObserverObservableWithClient):
         target_lot_contract_status = CONTRACT_STATUS_MAPPING.get(message['contract_status'])
         contract = self.client.patch_contract(
             message['lot_id'],
-            message['contract_id'],
+            message['lot_contract_id'],
             None,
             {"data": {"status": target_lot_contract_status}}
         )
@@ -58,3 +69,21 @@ class LotContractPatcher(ObserverObservableWithClient):
             'lot_contract_status': lot_contract.data.status
         })
         return recv_message
+
+
+class LotContractAlreadyCompleteHandler(BaseObserverObservable):
+
+    def _activate(self, message):
+        if (
+            message['lot_contract_status'] in LOT_CONTRACT_TERMINAL_STATUSES
+        ):
+            return True
+
+    def _run(self, message):
+        LOGGER.info(
+            'Contract {0} of lot {1} is already in terminal status'.format(
+                message['lot_contract_id'],
+                message['lot_id']
+            )
+        )
+        self._notify_observers(message)

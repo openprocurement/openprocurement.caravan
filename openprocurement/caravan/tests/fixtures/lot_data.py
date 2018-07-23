@@ -126,9 +126,9 @@ raw_active_contracting_lot = {
     ],
     "contracts": [
         {
-            "id": "25573217567c41ea89ee6b825c8ff3d0",
+            "id": "e93eedd243654524a94aa63a7e547240",
             "status": "scheduled",
-            "type": "yoke"
+            "type": "yoke",
         }
     ],
     "date": "2018-07-05T12:01:31.470022+03:00",

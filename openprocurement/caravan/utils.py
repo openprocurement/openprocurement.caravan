@@ -111,3 +111,10 @@ def get_sleep_time():
 def clean_db(db):
     for doc in db:
         del db[doc]
+
+
+def search_lot_contract_by_related_contract(lot_client, lot_id, related_contract_id):
+    """Returns munch with contract data, if found. Otherwise - returns None"""
+    lot = lot_client.get_lot(lot_id)
+    contract = search_list_with_dicts(lot.data.contracts, 'relatedProcessID', related_contract_id)
+    return contract
