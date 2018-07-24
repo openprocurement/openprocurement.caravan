@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from openprocurement_client.exceptions import (
+    ResourceNotFound,
+)
 from openprocurement.caravan.observers.base_observer import (
     BaseObserverObservable,
     ObserverObservableWithClient,
@@ -11,6 +14,9 @@ from openprocurement.caravan.utils import (
     LOGGER,
     search_lot_contract_by_related_contract,
 )
+from openprocurement.caravan.observers.errors import (
+    LOT_CONTRACT_NOT_FOUND,
+)
 
 
 class LotContractChecker(ObserverObservableWithClient):
@@ -21,8 +27,12 @@ class LotContractChecker(ObserverObservableWithClient):
             return True
 
     def _run(self, message):
-        lot_contract = self._check_lot_contract(message)
-        result = self._prepare_message(lot_contract, message)
+        try:
+            lot_contract = self._check_lot_contract(message)
+        except ResourceNotFound:
+            result = self._prepare_error_message(LOT_CONTRACT_NOT_FOUND, message)
+        else:
+            result = self._prepare_message(lot_contract, message)
         self._notify_observers(result)
 
     def _check_lot_contract(self, message):
@@ -38,6 +48,11 @@ class LotContractChecker(ObserverObservableWithClient):
             'lot_contract_id': lot_contract.id
         })
         return recv_message
+
+    def _prepare_error_message(self, error, in_message):
+        if error == LOT_CONTRACT_NOT_FOUND:
+            in_message.update({'error': LOT_CONTRACT_NOT_FOUND})
+            return in_message
 
 
 class LotContractPatcher(ObserverObservableWithClient):
@@ -87,3 +102,18 @@ class LotContractAlreadyCompleteHandler(BaseObserverObservable):
             )
         )
         self._notify_observers(message)
+
+
+class LotContractNotFoundHandler(BaseObserverObservable):
+
+    def _activate(self, message):
+        if (
+            message.get('error') == LOT_CONTRACT_NOT_FOUND
+        ):
+            return True
+
+    def _run(self, message):
+        LOGGER.error(
+            "Lot {0} or some it's subresource {1} not found".format(
+                message['lot_id'],
+                message['lot_contract_id']))

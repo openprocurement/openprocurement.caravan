@@ -20,6 +20,7 @@ from openprocurement.caravan.observers.contract import (
 from openprocurement.caravan.observers.lot import (
     LotContractAlreadyCompleteHandler,
     LotContractChecker,
+    LotContractNotFoundHandler,
     LotContractPatcher,
 )
 from openprocurement.caravan.tests.fixtures.contract import (
@@ -125,3 +126,35 @@ class LotContractCheckerLotContractAlreadyCompleteHandlerTest(TestCase):
             patched_contract = self.contracting_client.get_contract(self.contract.data.id)
             assert patched_contract.data.status == 'unsuccessful'
             assert len(mocked_patcher_run.call_args_list) == 0  # assert that lot patcher didn't run
+
+
+class LotContractNotFoundHandlerTest(TestCase):
+    
+    def setUp(self):
+        self.lots_client = get_lots_client()
+        self.lot_checker = LotContractChecker(self.lots_client)
+        self.lot_patcher = LotContractPatcher(self.lots_client)
+        self.lot_contract_not_found_handler = LotContractNotFoundHandler()
+
+        self.lot_checker.register_observer(self.lot_patcher)
+        self.lot_checker.register_observer(self.lot_contract_not_found_handler)
+
+        # fake ids to get 404
+        self.message = {
+            "contract_id": "70f301efd09c4240a5453de656fcc68b",
+            "lot_id": "1cf7be90a0554754ac5c3ebdf5d6e5c2",
+            "lot_contract_id": "65559cacb9f9476a97f6c5ae001c58f7",
+        }
+
+    @patch('openprocurement.caravan.observers.lot.LOGGER')
+    def test_ok(self, logger):
+        self.lot_checker.notify(self.message)
+        log_message = logger.error.call_args_list[0][0][0]
+        assert self.message['lot_id'] in log_message
+        assert self.message['lot_contract_id'] in log_message
+        assert 'not found' in log_message
+
+    def test_lot_patcher_not_run(self):
+        with patch.object(self.lot_patcher, '_run') as run:
+            self.lot_checker.notify(self.message)
+            assert len(run.call_args_list) == 0  # prove that `_run` isn't called
