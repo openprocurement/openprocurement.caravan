@@ -1,0 +1,28 @@
+---
+runner:
+    sleep_seconds:
+        min: 1
+        max: 3
+contracting:
+    db:
+        retries_on_connect:
+            - 1
+            - 2
+            - 3
+        name: "tests"
+        url: "http://localhost:5984"
+    api:
+        host: "http://localhost:6543"
+        version: "2.5"
+        token: "caravan"
+    test:
+        token_with_create_contract_permission: "contracting"
+
+lots:
+    api:
+        host: "http://localhost:6543"
+        version: "2.5"
+        token: "caravan"
+    test:
+        token_with_create_lot_permission: "broker1"
+...
