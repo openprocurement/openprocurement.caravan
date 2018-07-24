@@ -8,7 +8,6 @@ from openprocurement.caravan.tests.fixtures.lot import (
 )
 from openprocurement.caravan.utils import (
     prepare_db,
-    search_lot_contract_by_related_contract,
 )
 from openprocurement.caravan.tests.fixtures.contract import (
     p_terminated_contract,
@@ -32,16 +31,10 @@ class LotCheckerTest(unittest.TestCase):
         contracting_client = get_contracting_client_with_create_contract()
         self.contract = p_terminated_contract(contracting_client)
         self.lot_id = active_contracting_lot(self.contract.data.id, self.db)
-        interconnect_contract_with_lot(
+        lot_contract = interconnect_contract_with_lot(
             self.contract.data.id,
             self.lot_id,
             self.db
-        )
-
-        lot_contract = search_lot_contract_by_related_contract(
-            self.lots_client,
-            self.lot_id,
-            self.contract.data.id
         )
 
         self.client = get_lots_client()
@@ -50,7 +43,7 @@ class LotCheckerTest(unittest.TestCase):
         self.message = {
             "lot_id": self.lot_id,
             "contract_id": self.contract.data.id,
-            "lot_contract_id": lot_contract.id,
+            "lot_contract_id": lot_contract,
         }
 
     def test_check_lot_contract(self):

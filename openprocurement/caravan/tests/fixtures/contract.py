@@ -77,3 +77,4 @@ def interconnect_contract_with_lot(contract_id, lot_id, db):
 
     contract['merchandisingObject'] = lot_id
     db.save(contract)
+    return lot['contracts'][0]['id']

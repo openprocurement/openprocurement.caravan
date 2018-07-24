@@ -4,6 +4,7 @@ from mock import patch
 
 from openprocurement.caravan.utils import (
     prepare_db,
+    search_lot_contract_by_related_contract,
 )
 from openprocurement.caravan.clients import (
     get_contracting_client,
@@ -24,6 +25,7 @@ from openprocurement.caravan.observers.lot import (
 from openprocurement.caravan.tests.fixtures.contract import (
     p_terminated_contract,
     p_unsuccessful_contract,
+    interconnect_contract_with_lot,
 )
 from openprocurement.caravan.tests.fixtures.lot import (
     active_contracting_lot,
@@ -85,9 +87,10 @@ class LotContractCheckerLotContractAlreadyCompleteHandlerTest(TestCase):
 
     def setUp(self):
         self.db_server, self.db = prepare_db()
-        contracting_client = get_contracting_client_with_create_contract()
-        self.contract = p_unsuccessful_contract(contracting_client)
+        self.contracting_client = get_contracting_client_with_create_contract()
+        self.contract = p_unsuccessful_contract(self.contracting_client)
         self.lot_id = active_contracting_lot(self.contract.data.id, self.db)
+        lot_contract_id = interconnect_contract_with_lot(self.contract.data.id, self.lot_id, self.db)
 
         contracts_client = get_contracting_client()
         self.lots_client = get_lots_client()
@@ -96,25 +99,29 @@ class LotContractCheckerLotContractAlreadyCompleteHandlerTest(TestCase):
             "lot_id": self.lot_id,
             "contract_id": self.contract.data.id,
             "contract_status": self.contract.data.status,
+            "lot_contract_id": lot_contract_id,
         }
 
         self.checker = LotContractChecker(self.lots_client)
-        lots_patcher = LotContractPatcher(self.lots_client)
+        self.lots_patcher = LotContractPatcher(self.lots_client)
         contracts_patcher = ContractPatcher(contracts_client)
         lot_contract_completed_handler = LotContractAlreadyCompleteHandler()
 
-        self.checker.register_observer(lots_patcher)
-        lots_patcher.register_observer(contracts_patcher)
+        self.checker.register_observer(self.lots_patcher)
+        self.lots_patcher.register_observer(contracts_patcher)
         self.checker.register_observer(lot_contract_completed_handler)
         lot_contract_completed_handler.register_observer(contracts_patcher)
 
         self.lots_client.patch_contract(
             self.message['lot_id'],
-            self.message['contract_id'],
+            self.message['lot_contract_id'],
             None,
             {'data': {'status': 'unsuccessful'}}
         )
 
-#    def test_ok(self):
-#        import ipdb; ipdb.set_trace()
-#        self.checker.notify(self.message)
+    def test_ok(self):
+        with patch.object(self.lots_patcher, '_run') as mocked_patcher_run:
+            self.checker.notify(self.message)
+            patched_contract = self.contracting_client.get_contract(self.contract.data.id)
+            assert patched_contract.data.status == 'unsuccessful'
+            assert len(mocked_patcher_run.call_args_list) == 0  # assert that lot patcher didn't run
