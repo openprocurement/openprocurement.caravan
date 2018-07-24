@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from unittest import TestCase
 from mock import patch
+from nose.plugins.attrib import attr
 
 from openprocurement.caravan.utils import (
     prepare_db,
-    search_lot_contract_by_related_contract,
 )
 from openprocurement.caravan.clients import (
     get_contracting_client,
@@ -33,6 +33,7 @@ from openprocurement.caravan.tests.fixtures.lot import (
 )
 
 
+@attr('internal')
 class ContractCheckerContractNotFoundHandlerTest(TestCase):
 
     def setUp(self):
@@ -56,6 +57,7 @@ class ContractCheckerContractNotFoundHandlerTest(TestCase):
         assert 'not found' in log_message
 
 
+@attr('internal')
 class ContractCheckerWhenContractAlreadyPatched(TestCase):
 
     def setUp(self):
@@ -84,6 +86,7 @@ class ContractCheckerWhenContractAlreadyPatched(TestCase):
         assert 'already terminated' in log_message
 
 
+@attr('internal')
 class LotContractCheckerLotContractAlreadyCompleteHandlerTest(TestCase):
 
     def setUp(self):
@@ -128,8 +131,9 @@ class LotContractCheckerLotContractAlreadyCompleteHandlerTest(TestCase):
             assert len(mocked_patcher_run.call_args_list) == 0  # assert that lot patcher didn't run
 
 
+@attr('internal')
 class LotContractNotFoundHandlerTest(TestCase):
-    
+
     def setUp(self):
         self.lots_client = get_lots_client()
         self.lot_checker = LotContractChecker(self.lots_client)

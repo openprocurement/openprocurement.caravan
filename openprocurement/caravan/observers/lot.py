@@ -60,7 +60,8 @@ class LotContractPatcher(ObserverObservableWithClient):
     def _activate(self, message):
         if (
             not message.get('error')
-            and not (message['lot_contract_status'] in LOT_CONTRACT_TERMINAL_STATUSES)  # skip already finished contracts
+            # skip already finished contracts
+            and not (message['lot_contract_status'] in LOT_CONTRACT_TERMINAL_STATUSES)
         ):
             return True
 
