@@ -4,7 +4,6 @@ from mock import patch
 
 from openprocurement.caravan.utils import (
     prepare_db,
-    search_lot_contract_by_related_contract,
 )
 from openprocurement.caravan.clients import (
     get_contracting_client,
@@ -129,7 +128,7 @@ class LotContractCheckerLotContractAlreadyCompleteHandlerTest(TestCase):
 
 
 class LotContractNotFoundHandlerTest(TestCase):
-    
+
     def setUp(self):
         self.lots_client = get_lots_client()
         self.lot_checker = LotContractChecker(self.lots_client)

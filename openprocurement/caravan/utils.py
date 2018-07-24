@@ -6,7 +6,6 @@ import random
 import socket
 
 from couchdb import Server, Session
-from pkg_resources import get_distribution
 from uuid import uuid4
 
 from logging import getLogger

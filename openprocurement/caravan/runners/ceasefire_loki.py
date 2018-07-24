@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys
 from time import sleep
-from retrying import retry
 
 from openprocurement.caravan.watchers.contracts_watcher import (
     ContractsDBWatcher,

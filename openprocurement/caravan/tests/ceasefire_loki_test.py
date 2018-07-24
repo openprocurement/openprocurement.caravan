@@ -13,21 +13,9 @@ from openprocurement.caravan.clients import (
 from openprocurement.caravan.tests.fixtures.contract import (
     interconnect_contract_with_lot,
     p_terminated_contract,
-    p_unsuccessful_contract,
 )
 from openprocurement.caravan.tests.fixtures.lot import (
     active_contracting_lot,
-)
-from openprocurement.caravan.watchers.contracts_watcher import (
-    ContractsDBWatcher,
-)
-from openprocurement.caravan.observers.contract import (
-    ContractChecker,
-    ContractPatcher,
-)
-from openprocurement.caravan.observers.lot import (
-    LotContractChecker,
-    LotContractPatcher,
 )
 
 
