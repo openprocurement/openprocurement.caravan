@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '2.4.2'
+version = '1.0.0'
 
 requires = [
     'setuptools',
@@ -15,10 +15,11 @@ docs_requires = requires + [
     'sphinxcontrib-httpdomain',
 ]
 
-api_requires = requires + [
-    'openprocurement.api>=2.4',
-    'openprocurement.auctions.core',
-]
+entry_points = {
+    'console_scripts': [
+        'ceasefire_loki_caravan = openprocurement.caravan.runners.ceasefire_loki:main'
+    ]
+}
 
 
 setup(name='openprocurement.caravan',
@@ -44,9 +45,8 @@ setup(name='openprocurement.caravan',
       install_requires=requires,
       tests_require=test_requires,
       extras_require={
-          'api': api_requires,
           'test': test_requires,
           'docs': docs_requires
       },
-      # entry_points=entry_points,
+      entry_points=entry_points,
       )
