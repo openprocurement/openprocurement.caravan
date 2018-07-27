@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from time import sleep
 
+from openprocurement.caravan.utils import prepare_db
 from openprocurement.caravan.watchers.contracts_watcher import (
     ContractsDBWatcher,
 )
@@ -18,6 +19,10 @@ from openprocurement.caravan.observers.lot import (
 )
 from openprocurement.caravan.runners.base_runner import (
     BaseRunner,
+)
+from openprocurement.caravan.clients import (
+    get_contracting_client,
+    get_lots_client,
 )
 from openprocurement.caravan.utils import get_sleep_time
 
@@ -70,3 +75,12 @@ class CeasefireLokiRunner(BaseRunner):
         while not self.killer.kill:
             self._sync_one_watchers_queue()
             sleep(get_sleep_time())
+
+
+if __name__ == '__main__':
+    _, db = prepare_db()
+    ceasefire_client = get_contracting_client()
+    loki_client = get_lots_client()
+    runner = CeasefireLokiRunner(db, ceasefire_client, loki_client)
+
+    runner.start()
