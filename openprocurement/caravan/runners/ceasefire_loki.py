@@ -1,19 +1,28 @@
 # -*- coding: utf-8 -*-
 from time import sleep
 
+from openprocurement.caravan.utils import prepare_db
 from openprocurement.caravan.watchers.contracts_watcher import (
     ContractsDBWatcher,
 )
 from openprocurement.caravan.observers.contract import (
+    ContractAlreadyTerminatedHandler,
     ContractChecker,
+    ContractNotFoundHandler,
     ContractPatcher,
 )
 from openprocurement.caravan.observers.lot import (
+    LotContractAlreadyCompleteHandler,
     LotContractChecker,
+    LotContractNotFoundHandler,
     LotContractPatcher,
 )
 from openprocurement.caravan.runners.base_runner import (
     BaseRunner,
+)
+from openprocurement.caravan.clients import (
+    get_contracting_client,
+    get_lots_client,
 )
 from openprocurement.caravan.utils import get_sleep_time
 
@@ -21,6 +30,11 @@ from openprocurement.caravan.utils import get_sleep_time
 class CeasefireLokiRunner(BaseRunner):
 
     def __init__(self, ceasefire_db, ceasefire_client, loki_client):
+        """Runner init and observers interconnection
+
+        It's complicated, so you're welcome to see explanatory diagram in
+        `docs/caravan.xml` on draw.io
+        """
         super(CeasefireLokiRunner, self).__init__()
 
         # init db watcher
@@ -28,14 +42,26 @@ class CeasefireLokiRunner(BaseRunner):
 
         # init observers
         contract_checker = ContractChecker(ceasefire_client)
+        contract_patcher = ContractPatcher(ceasefire_client)
+        contract_already_terminated_handler = ContractAlreadyTerminatedHandler()
+        contract_not_found_handler = ContractNotFoundHandler()
+
         lot_contract_checker = LotContractChecker(loki_client)
         lot_contract_patcher = LotContractPatcher(loki_client)
-        contract_patcher = ContractPatcher(ceasefire_client)
+        lot_contract_already_complete_handler = LotContractAlreadyCompleteHandler()
+        lot_contract_not_found_handler = LotContractNotFoundHandler()
 
         # connect observers
+        # base flow
         contract_checker.register_observer(lot_contract_checker)
         lot_contract_checker.register_observer(lot_contract_patcher)
         lot_contract_patcher.register_observer(contract_patcher)
+        # handlers
+        contract_checker.register_observer(contract_already_terminated_handler)
+        contract_checker.register_observer(contract_not_found_handler)
+
+        lot_contract_checker.register_observer(lot_contract_already_complete_handler)
+        lot_contract_checker.register_observer(lot_contract_not_found_handler)
 
         self.first_observer = contract_checker
 
@@ -49,3 +75,12 @@ class CeasefireLokiRunner(BaseRunner):
         while not self.killer.kill:
             self._sync_one_watchers_queue()
             sleep(get_sleep_time())
+
+
+def main():
+    _, db = prepare_db()
+    ceasefire_client = get_contracting_client()
+    loki_client = get_lots_client()
+    runner = CeasefireLokiRunner(db, ceasefire_client, loki_client)
+
+    runner.start()
