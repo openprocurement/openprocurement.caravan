@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from time import sleep
 
-from openprocurement.caravan.utils import prepare_db
+from openprocurement.caravan.utils import (
+    parse_args,
+    prepare_db,
+)
 from openprocurement.caravan.watchers.contracts_watcher import (
     ContractsDBWatcher,
 )
@@ -78,6 +81,7 @@ class CeasefireLokiRunner(BaseRunner):
 
 
 def main():
+    args = parse_args()
     _, db = prepare_db()
     ceasefire_client = get_contracting_client()
     loki_client = get_lots_client()

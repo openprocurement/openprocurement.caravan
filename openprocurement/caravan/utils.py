@@ -4,6 +4,7 @@ import logging
 import os
 import random
 import socket
+import argparse
 
 from couchdb import Server, Session
 from uuid import uuid4
@@ -125,3 +126,11 @@ def search_lot_contract_by_related_contract(lot_client, lot_id, related_contract
     lot = lot_client.get_lot(lot_id)
     contract = search_list_with_dicts(lot.data.contracts, 'relatedProcessID', related_contract_id)
     return contract
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Synchronize Ceasefire contracting with Loki lots'
+    )
+    parser.add_argument('config', type=str, help='Path to configuration file')
+    params = parser.parse_args()
+    return params
