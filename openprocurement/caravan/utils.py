@@ -17,6 +17,14 @@ from openprocurement.caravan.constants import (
 LOGGER = getLogger('openprocurement.caravan')
 
 
+def db_url():
+    protocol = config['contracting']['db']['protocol']
+    host = config['contracting']['db']['host']
+    port = config['contracting']['db']['port']
+    url = "{0}://{1}:{2}".format(protocol, host, port)
+    return url
+
+
 def connect_to_db_server(url, check_connection=True):
     """Connect to the CouchDB"""
     server = Server(url, session=Session(retry_delays=config['contracting']['db']['retries_on_connect']))
@@ -51,7 +59,7 @@ def get_db(name, server):
 
 def prepare_db():
     """Shorthand helper to prepare DB in one call"""
-    server = connect_to_db_server(config['contracting']['db']['url'])
+    server = connect_to_db_server(db_url())
     db = get_db(config['contracting']['db']['name'], server)
     return server, db
 

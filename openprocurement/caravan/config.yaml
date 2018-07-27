@@ -10,7 +10,9 @@ contracting:
             - 2
             - 3
         name: "tests"
-        url: "http://localhost:5984"
+        protocol: "http"
+        host: "localhost"
+        port: 5984
     api:
         host: "http://localhost:6543"
         version: "2.5"
