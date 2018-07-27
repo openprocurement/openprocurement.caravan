@@ -77,7 +77,7 @@ class CeasefireLokiRunner(BaseRunner):
             sleep(get_sleep_time())
 
 
-if __name__ == '__main__':
+def main():
     _, db = prepare_db()
     ceasefire_client = get_contracting_client()
     loki_client = get_lots_client()
