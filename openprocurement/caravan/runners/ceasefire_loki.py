@@ -3,8 +3,10 @@ from time import sleep
 from random import randint
 
 from openprocurement.caravan.utils import (
+    connect_to_db,
     parse_args,
 )
+from openprocurement.caravan.config import app_config
 from openprocurement.caravan.watchers.contracts_watcher import (
     ContractsDBWatcher,
 )
@@ -22,6 +24,12 @@ from openprocurement.caravan.observers.lot import (
 )
 from openprocurement.caravan.runners.base_runner import (
     BaseRunner,
+)
+from openprocurement_client.resources.contracts import (
+    ContractingClient,
+)
+from openprocurement_client.resources.lots import (
+    LotsClient,
 )
 
 
@@ -81,9 +89,33 @@ class CeasefireLokiRunner(BaseRunner):
 
 def main():
     args = parse_args()
-    _, db = prepare_db()
-    ceasefire_client = get_contracting_client()
-    loki_client = get_lots_client()
-    runner = CeasefireLokiRunner(db, ceasefire_client, loki_client)
+    config = app_config(args.config)
+
+    db = connect_to_db(
+        config.contracting.db.protocol,
+        config.contracting.db.host,
+        config.contracting.db.port,
+        config.contracting.db.name
+    )
+
+    ceasefire_client = ContractingClient(
+        host_url=config.contracting.api.host,
+        api_version=config.contracting.api.version,
+        key=config.contracting.api.token,
+    )
+
+    loki_client = LotsClient(
+        host_url=config.lots.api.host,
+        api_version=config.lots.api.version,
+        key=config.lots.api.token,
+    )
+
+    sleep_time_range = (
+        config.runner.sleep_seconds.min,
+        config.runner.sleep_seconds.max
+    )
+
+    import ipdb; ipdb.set_trace()
+    runner = CeasefireLokiRunner(db, ceasefire_client, loki_client, sleep_time_range)
 
     runner.start()

@@ -52,6 +52,15 @@ def get_db(name, server):
     return db
 
 
+def connect_to_db(proto, host, port, db_name, **kwargs):
+    retries = (1, 2, 3)
+    if kwargs.get('retries'):
+        retries = kwargs.get('retries')
+    url = db_url(proto, host, port)
+    srv = connect_to_db_server(url, retries)
+    return get_db(db_name, srv)
+
+
 def load_fixture(filepath, db):
     """Load some documents into DB from file
 
