@@ -1,21 +1,14 @@
 # -*- coding: utf-8 -*-
-import unittest
 from mock import patch, Mock
 from nose.plugins.attrib import attr
 
+from openprocurement.caravan.tests.base import CeasefireLokiBaseTest
 from openprocurement.caravan.tests.fixtures.lot import (
     active_contracting_lot,
-)
-from openprocurement.caravan.utils import (
-    prepare_db,
 )
 from openprocurement.caravan.tests.fixtures.contract import (
     p_terminated_contract,
     interconnect_contract_with_lot,
-)
-from openprocurement.caravan.clients import (
-    get_contracting_client_with_create_contract,
-    get_lots_client,
 )
 from openprocurement.caravan.observers.lot import (
     LotContractPatcher,
@@ -23,18 +16,15 @@ from openprocurement.caravan.observers.lot import (
 
 
 @attr('internal')
-class LotContractPatcherTest(unittest.TestCase):
+class LotContractPatcherTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        self.db_server, self.db = prepare_db()
-        contracting_client = get_contracting_client_with_create_contract()
-        self.contract = p_terminated_contract(contracting_client)
-        self.lots_client = get_lots_client()
+        super(LotContractPatcherTest, self).setUp()
+        self.contract = p_terminated_contract(self.contracting_client_with_create)
         self.lot_id = active_contracting_lot(self.contract.data.id, self.db)
         lot_contract_id = interconnect_contract_with_lot(self.contract.data.id, self.lot_id, self.db)
 
-        self.client = get_lots_client()
-        self.patcher = LotContractPatcher(self.client)
+        self.patcher = LotContractPatcher(self.lots_client)
 
         self.message = {
             "lot_id": self.lot_id,
@@ -47,7 +37,7 @@ class LotContractPatcherTest(unittest.TestCase):
     def test_patch_lot_contract_to_complete(self):
         contract = self.patcher._patch_lot_contract(self.message)
         assert contract.data.status == 'complete'
-        lot_from_api_after_contract_patch = self.client.get_lot(self.lot_id)
+        lot_from_api_after_contract_patch = self.lots_client.get_lot(self.lot_id)
         assert lot_from_api_after_contract_patch.data.status == 'pending.sold'
 
     def test_prepare_message(self):

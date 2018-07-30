@@ -6,7 +6,7 @@ from openprocurement.caravan.observers.base_observer import (
     BaseObserverObservable,
     ObserverObservableWithClient,
 )
-from openprocurement.caravan.constants import (
+from openprocurement.caravan.observers.constants import (
     CONTRACT_STATUS_MAPPING,
     LOT_CONTRACT_TERMINAL_STATUSES,
 )

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from time import sleep
+from random import randint
 
 from openprocurement.caravan.utils import (
     parse_args,
-    prepare_db,
 )
 from openprocurement.caravan.watchers.contracts_watcher import (
     ContractsDBWatcher,
@@ -23,22 +23,21 @@ from openprocurement.caravan.observers.lot import (
 from openprocurement.caravan.runners.base_runner import (
     BaseRunner,
 )
-from openprocurement.caravan.clients import (
-    get_contracting_client,
-    get_lots_client,
-)
-from openprocurement.caravan.utils import get_sleep_time
 
 
 class CeasefireLokiRunner(BaseRunner):
 
-    def __init__(self, ceasefire_db, ceasefire_client, loki_client):
+    def __init__(self, ceasefire_db, ceasefire_client, loki_client, sleep_time_range):
         """Runner init and observers interconnection
 
         It's complicated, so you're welcome to see explanatory diagram in
         `docs/caravan.xml` on draw.io
+
+        :param sleep_time_range: tuple with min and max sleep time in seconds like (1, 10)
         """
         super(CeasefireLokiRunner, self).__init__()
+
+        self.sleep_time_range = sleep_time_range
 
         # init db watcher
         self.db_watcher = ContractsDBWatcher(ceasefire_db)
@@ -77,7 +76,7 @@ class CeasefireLokiRunner(BaseRunner):
     def start(self):
         while not self.killer.kill:
             self._sync_one_watchers_queue()
-            sleep(get_sleep_time())
+            sleep(randint(*self.sleep_time_range))
 
 
 def main():

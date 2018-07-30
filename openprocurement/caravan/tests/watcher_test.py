@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import unittest
-
 from nose.plugins.attrib import attr
+
+from openprocurement.caravan.tests.base import CeasefireLokiBaseTest
 from openprocurement.caravan import utils
 from openprocurement.caravan.watchers.contracts_watcher import (
     ContractsDBWatcher,
@@ -10,19 +10,15 @@ from openprocurement.caravan.tests.fixtures.contract import (
     p_terminated_contract,
     p_unsuccessful_contract,
 )
-from openprocurement.caravan.clients import (
-    get_contracting_client_with_create_contract,
-)
 
 
 @attr('internal')
-class WatcherUpdateTest(unittest.TestCase):
+class WatcherUpdateTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        self.db_server, self.db = utils.prepare_db()
-        client_with_create = get_contracting_client_with_create_contract()
-        p_terminated_contract(client_with_create)
-        p_unsuccessful_contract(client_with_create)
+        super(WatcherUpdateTest, self).setUp()
+        p_terminated_contract(self.contracting_client_with_create)
+        p_unsuccessful_contract(self.contracting_client_with_create)
 
     def test_update_ok(self):
         cw = ContractsDBWatcher(self.db)

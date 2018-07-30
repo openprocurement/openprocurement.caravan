@@ -1,21 +1,14 @@
 # -*- coding: utf-8 -*-
-import unittest
 from mock import patch, Mock
 from nose.plugins.attrib import attr
 
+from openprocurement.caravan.tests.base import CeasefireLokiBaseTest
 from openprocurement.caravan.tests.fixtures.lot import (
     active_contracting_lot,
-)
-from openprocurement.caravan.utils import (
-    prepare_db,
 )
 from openprocurement.caravan.tests.fixtures.contract import (
     p_terminated_contract,
     interconnect_contract_with_lot,
-)
-from openprocurement.caravan.clients import (
-    get_contracting_client_with_create_contract,
-    get_lots_client,
 )
 from openprocurement.caravan.observers.lot import (
     LotContractChecker,
@@ -23,13 +16,11 @@ from openprocurement.caravan.observers.lot import (
 
 
 @attr('internal')
-class LotCheckerTest(unittest.TestCase):
+class LotCheckerTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        self.db_server, self.db = prepare_db()
-        self.lots_client = get_lots_client()
-        contracting_client = get_contracting_client_with_create_contract()
-        self.contract = p_terminated_contract(contracting_client)
+        super(LotCheckerTest,self).setUp()
+        self.contract = p_terminated_contract(self.contracting_client_with_create)
         self.lot_id = active_contracting_lot(self.contract.data.id, self.db)
         lot_contract = interconnect_contract_with_lot(
             self.contract.data.id,
@@ -37,8 +28,7 @@ class LotCheckerTest(unittest.TestCase):
             self.db
         )
 
-        self.client = get_lots_client()
-        self.checker = LotContractChecker(self.client)
+        self.checker = LotContractChecker(self.lots_client)
 
         self.message = {
             "lot_id": self.lot_id,
@@ -51,12 +41,12 @@ class LotCheckerTest(unittest.TestCase):
         assert lot_contract_from_checker.relatedProcessID == self.contract.data.id
 
     def test_prepare_message(self):
-        lot_contract_from_api = self.client.get_contract(self.lot_id, self.message['lot_contract_id']).data
+        lot_contract_from_api = self.lots_client.get_contract(self.lot_id, self.message['lot_contract_id']).data
         message = self.checker._prepare_message(lot_contract_from_api, {})
         assert message['lot_contract_status'] is not None
 
     def test_notify(self):
-        lot_from_api = self.client.get_lot(self.lot_id)
+        lot_from_api = self.lots_client.get_lot(self.lot_id)
         observer = Mock()
         self.checker.register_observer(observer)
         with patch.object(self.checker, '_notify_observers') as mock_notify_observers:
