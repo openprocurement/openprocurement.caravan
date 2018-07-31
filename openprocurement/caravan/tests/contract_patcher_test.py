@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-import unittest
 from mock import patch
 from nose.plugins.attrib import attr
 
+from openprocurement.caravan.tests.base import CeasefireLokiBaseTest
 from openprocurement.caravan.tests.fixtures.contract import (
     p_terminated_contract,
-)
-from openprocurement.caravan.clients import (
-    get_contracting_client,
-    get_contracting_client_with_create_contract,
 )
 from openprocurement.caravan.observers.contract import (
     ContractPatcher,
@@ -16,14 +12,13 @@ from openprocurement.caravan.observers.contract import (
 
 
 @attr('internal')
-class ContractPatcherTest(unittest.TestCase):
+class ContractPatcherTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        client_with_create_permission = get_contracting_client_with_create_contract()
-        self.p_terminated_contract = p_terminated_contract(client_with_create_permission)
+        super(ContractPatcherTest, self).setUp()
+        self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create)
 
-        self.client = get_contracting_client()
-        self.patcher = ContractPatcher(self.client)
+        self.patcher = ContractPatcher(self.contracting_client)
 
         self.message = {
             "contract_id": self.p_terminated_contract.data.id,

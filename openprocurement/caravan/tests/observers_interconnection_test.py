@@ -1,16 +1,8 @@
 # -*- coding: utf-8 -*-
-from unittest import TestCase
 from mock import patch
 from nose.plugins.attrib import attr
 
-from openprocurement.caravan.utils import (
-    prepare_db,
-)
-from openprocurement.caravan.clients import (
-    get_contracting_client,
-    get_contracting_client_with_create_contract,
-    get_lots_client,
-)
+from openprocurement.caravan.tests.base import CeasefireLokiBaseTest
 from openprocurement.caravan.observers.contract import (
     ContractAlreadyTerminatedHandler,
     ContractChecker,
@@ -34,16 +26,15 @@ from openprocurement.caravan.tests.fixtures.lot import (
 
 
 @attr('internal')
-class ContractCheckerContractNotFoundHandlerTest(TestCase):
+class ContractCheckerContractNotFoundHandlerTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        self.client = get_contracting_client()
-        self.lots_client = get_lots_client()
-        self.checker = ContractChecker(self.client)
+        super(ContractCheckerContractNotFoundHandlerTest, self).setUp()
+        self.checker = ContractChecker(self.contracting_client)
         self.message = {
             "contract_id": "074d43928e36414487fc2a41d53cb5ba"  # unreal ID
         }
-        self.checker = ContractChecker(self.client)
+        self.checker = ContractChecker(self.contracting_client)
         not_found_handler = ContractNotFoundHandler()
         lot_checker = LotContractChecker(self.lots_client)
         self.checker.register_observer(not_found_handler)
@@ -58,14 +49,13 @@ class ContractCheckerContractNotFoundHandlerTest(TestCase):
 
 
 @attr('internal')
-class ContractCheckerWhenContractAlreadyPatched(TestCase):
+class ContractCheckerWhenContractAlreadyPatched(CeasefireLokiBaseTest):
 
     def setUp(self):
-        client_with_create_permission = get_contracting_client_with_create_contract()
-        self.p_terminated_contract = p_terminated_contract(client_with_create_permission)
+        super(ContractCheckerWhenContractAlreadyPatched, self).setUp()
+        self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create)
 
-        self.client = get_contracting_client()
-        self.checker = ContractChecker(self.client)
+        self.checker = ContractChecker(self.contracting_client)
         not_found_handler = ContractNotFoundHandler()
         ready_contract_handler = ContractAlreadyTerminatedHandler()
         self.checker.register_observer(not_found_handler)
@@ -76,7 +66,7 @@ class ContractCheckerWhenContractAlreadyPatched(TestCase):
 
     @patch('openprocurement.caravan.observers.contract.LOGGER')
     def test_ok(self, logger):
-        self.client.patch_contract(
+        self.contracting_client.patch_contract(
             self.message['contract_id'],
             None,
             {'data': {'status': 'terminated'}}
@@ -87,17 +77,13 @@ class ContractCheckerWhenContractAlreadyPatched(TestCase):
 
 
 @attr('internal')
-class LotContractCheckerLotContractAlreadyCompleteHandlerTest(TestCase):
+class LotContractCheckerLotContractAlreadyCompleteHandlerTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        self.db_server, self.db = prepare_db()
-        self.contracting_client = get_contracting_client_with_create_contract()
-        self.contract = p_unsuccessful_contract(self.contracting_client)
+        super(LotContractCheckerLotContractAlreadyCompleteHandlerTest, self).setUp()
+        self.contract = p_unsuccessful_contract(self.contracting_client_with_create)
         self.lot_id = active_contracting_lot(self.contract.data.id, self.db)
         lot_contract_id = interconnect_contract_with_lot(self.contract.data.id, self.lot_id, self.db)
-
-        contracts_client = get_contracting_client()
-        self.lots_client = get_lots_client()
 
         self.message = {
             "lot_id": self.lot_id,
@@ -108,7 +94,7 @@ class LotContractCheckerLotContractAlreadyCompleteHandlerTest(TestCase):
 
         self.checker = LotContractChecker(self.lots_client)
         self.lots_patcher = LotContractPatcher(self.lots_client)
-        contracts_patcher = ContractPatcher(contracts_client)
+        contracts_patcher = ContractPatcher(self.contracting_client)
         lot_contract_completed_handler = LotContractAlreadyCompleteHandler()
 
         self.checker.register_observer(self.lots_patcher)
@@ -132,10 +118,10 @@ class LotContractCheckerLotContractAlreadyCompleteHandlerTest(TestCase):
 
 
 @attr('internal')
-class LotContractNotFoundHandlerTest(TestCase):
+class LotContractNotFoundHandlerTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        self.lots_client = get_lots_client()
+        super(LotContractNotFoundHandlerTest, self).setUp()
         self.lot_checker = LotContractChecker(self.lots_client)
         self.lot_patcher = LotContractPatcher(self.lots_client)
         self.lot_contract_not_found_handler = LotContractNotFoundHandler()

@@ -19,7 +19,7 @@ class ConnectToDBTest(unittest.TestCase):
     def test_ok(self, server, session):
         url = 'http://localhost:5984'
         server.return_value = 'ok'
-        server = connect_to_db_server(url, check_connection=False)
+        server = connect_to_db_server(url, [1, 2], check_connection=False)
         assert server == 'ok'
 
     @patch('openprocurement.caravan.utils.Session')
@@ -29,7 +29,7 @@ class ConnectToDBTest(unittest.TestCase):
         create_db_mock = Mock()
         create_db_mock.create.side_effect = error
         server.return_value = create_db_mock
-        created_server = connect_to_db_server(url)
+        created_server = connect_to_db_server(url, (1, 2))
         assert created_server is None
 
 
