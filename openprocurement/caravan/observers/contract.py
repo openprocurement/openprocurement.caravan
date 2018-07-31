@@ -6,9 +6,9 @@ from openprocurement.caravan.observers.base_observer import (
     BaseObserverObservable,
     ObserverObservableWithClient,
 )
-from openprocurement.caravan.constants import (
-    PRE_TERMINATED_STATUS_PREFIX,
+from openprocurement.caravan.observers.constants import (
     CONTRACT_STATUS_MAPPING,
+    PRE_TERMINATED_STATUS_PREFIX,
 )
 from openprocurement.caravan.observers.errors import (
     CONTRACT_NOT_FOUND,

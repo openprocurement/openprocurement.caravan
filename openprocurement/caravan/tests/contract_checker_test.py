@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-import unittest
-
 from mock import patch
 from nose.plugins.attrib import attr
+from openprocurement.caravan.tests.base import (
+    CeasefireLokiBaseTest,
+)
 from openprocurement.caravan.tests.fixtures.contract import (
     p_terminated_contract,
-)
-from openprocurement.caravan.clients import (
-    get_contracting_client,
-    get_contracting_client_with_create_contract,
 )
 from openprocurement.caravan.observers.contract import (
     ContractChecker,
@@ -19,14 +16,13 @@ from openprocurement.caravan.observers.errors import (
 
 
 @attr('internal')
-class ContractCheckerTest(unittest.TestCase):
+class ContractCheckerTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        client_with_create_permission = get_contracting_client_with_create_contract()
-        self.p_terminated_contract = p_terminated_contract(client_with_create_permission)
+        super(ContractCheckerTest, self).setUp()
+        self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create)
 
-        self.client = get_contracting_client()
-        self.checker = ContractChecker(self.client)
+        self.checker = ContractChecker(self.contracting_client)
         self.message = {
             "contract_id": self.p_terminated_contract.data.id,
         }
@@ -59,7 +55,7 @@ class ContractCheckerTest(unittest.TestCase):
             assert out_message['error'] == CONTRACT_NOT_FOUND
 
     def test_contract_already_terminated(self):
-        self.client.patch_contract(
+        self.contracting_client.patch_contract(
             self.message['contract_id'],
             None,
             {'data': {'status': 'terminated'}}
