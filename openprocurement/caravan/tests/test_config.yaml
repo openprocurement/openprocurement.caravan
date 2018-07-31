@@ -13,6 +13,8 @@ contracting:
         protocol: "http"
         host: "localhost"
         port: 5984
+        login: ""
+        password: ""
     api:
         host: "http://localhost:6543"
         version: "2.5"
