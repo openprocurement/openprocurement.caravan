@@ -13,7 +13,11 @@ from logging import getLogger
 LOGGER = getLogger('openprocurement.caravan')
 
 
-def db_url(protocol, host, port):
+def db_url(protocol, host, port, login="", password=""):
+    if login != "" and password != "":
+        return "{0}://{1}:{2}@{3}:{4}".format(
+            protocol, login, password, host, port
+        )
     return "{0}://{1}:{2}".format(protocol, host, port)
 
 
@@ -52,11 +56,11 @@ def get_db(name, server):
     return db
 
 
-def connect_to_db(proto, host, port, db_name, **kwargs):
+def connect_to_db(proto, host, port, login, password, db_name, **kwargs):
     retries = (1, 2, 3)
     if kwargs.get('retries'):
         retries = kwargs.get('retries')
-    url = db_url(proto, host, port)
+    url = db_url(proto, host, port, login, password)
     srv = connect_to_db_server(url, retries)
     return get_db(db_name, srv)
 
