@@ -95,7 +95,9 @@ def main():
         config.contracting.db.protocol,
         config.contracting.db.host,
         config.contracting.db.port,
-        config.contracting.db.name
+        config.contracting.db.login,
+        config.contracting.db.password,
+        config.contracting.db.name,
     )
 
     ceasefire_client = ContractingClient(
