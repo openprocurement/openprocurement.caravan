@@ -31,6 +31,7 @@ from openprocurement_client.resources.contracts import (
 from openprocurement_client.resources.lots import (
     LotsClient,
 )
+from openprocurement.caravan.utils import LOGGER
 
 
 class CeasefireLokiRunner(BaseRunner):
@@ -45,6 +46,7 @@ class CeasefireLokiRunner(BaseRunner):
         """
         super(CeasefireLokiRunner, self).__init__()
 
+        LOGGER.info("~~Init CeasefireLokiRunner~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         self.sleep_time_range = sleep_time_range
 
         # init db watcher
@@ -69,28 +71,38 @@ class CeasefireLokiRunner(BaseRunner):
         # handlers
         contract_checker.register_observer(contract_already_terminated_handler)
         contract_checker.register_observer(contract_not_found_handler)
+        lot_contract_already_complete_handler.register_observer(contract_patcher)
 
         lot_contract_checker.register_observer(lot_contract_already_complete_handler)
         lot_contract_checker.register_observer(lot_contract_not_found_handler)
 
         self.first_observer = contract_checker
 
+        LOGGER.info("~~Init CeasefireLokiRunner OK~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
     def _sync_one_watchers_queue(self):
+        LOGGER.info("Looking into db")
         found_contracts_count = self.db_watcher.update()
+        LOGGER.info("%d contracts fetched.", found_contracts_count)
         for _ in xrange(found_contracts_count):
             contract_id = self.db_watcher.get()
+            LOGGER.info("~~Processing~~~~%s~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", contract_id)
             self.first_observer.notify({'contract_id': contract_id})
+            LOGGER.info("~~Processed~~~~~%s~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", contract_id)
 
     def start(self):
         while not self.killer.kill:
             self._sync_one_watchers_queue()
-            sleep(randint(*self.sleep_time_range))
+            sleep_time = randint(*self.sleep_time_range)
+            LOGGER.info("==Gone sleep for %d seconds=====================================================", sleep_time)
+            sleep(sleep_time)
 
 
 def main():
     args = parse_args()
     config = app_config(args.config)
 
+    LOGGER.info("Connecting to DB...")
     db = connect_to_db(
         config.contracting.db.protocol,
         config.contracting.db.host,
@@ -99,7 +111,9 @@ def main():
         config.contracting.db.password,
         config.contracting.db.name,
     )
+    LOGGER.info("Connected to DB")
 
+    LOGGER.info("Init clients")
     ceasefire_client = ContractingClient(
         host_url=config.contracting.api.host,
         api_version=config.contracting.api.version,
@@ -111,6 +125,7 @@ def main():
         api_version=config.lots.api.version,
         key=config.lots.api.token,
     )
+    LOGGER.info("Clients are ready")
 
     sleep_time_range = (
         config.runner.sleep_seconds.min,
