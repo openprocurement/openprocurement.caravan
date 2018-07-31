@@ -19,7 +19,7 @@ from openprocurement.caravan.observers.lot import (
 class LotCheckerTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        super(LotCheckerTest,self).setUp()
+        super(LotCheckerTest, self).setUp()
         self.contract = p_terminated_contract(self.contracting_client_with_create)
         self.lot_id = active_contracting_lot(self.contract.data.id, self.db)
         lot_contract = interconnect_contract_with_lot(

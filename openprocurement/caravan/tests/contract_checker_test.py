@@ -19,7 +19,7 @@ from openprocurement.caravan.observers.errors import (
 class ContractCheckerTest(CeasefireLokiBaseTest):
 
     def setUp(self):
-        super(ContractCheckerTest,self).setUp()
+        super(ContractCheckerTest, self).setUp()
         self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create)
 
         self.checker = ContractChecker(self.contracting_client)

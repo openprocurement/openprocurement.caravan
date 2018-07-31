@@ -115,7 +115,6 @@ def main():
         config.runner.sleep_seconds.max
     )
 
-    import ipdb; ipdb.set_trace()
     runner = CeasefireLokiRunner(db, ceasefire_client, loki_client, sleep_time_range)
 
     runner.start()

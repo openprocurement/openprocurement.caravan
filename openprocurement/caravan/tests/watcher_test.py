@@ -2,7 +2,6 @@
 from nose.plugins.attrib import attr
 
 from openprocurement.caravan.tests.base import CeasefireLokiBaseTest
-from openprocurement.caravan import utils
 from openprocurement.caravan.watchers.contracts_watcher import (
     ContractsDBWatcher,
 )

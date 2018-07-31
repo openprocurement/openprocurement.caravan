@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from unittest import TestCase
 from nose.plugins.attrib import attr
 
 from openprocurement.caravan.tests.base import CeasefireLokiBaseTest
