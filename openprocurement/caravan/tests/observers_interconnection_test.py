@@ -72,7 +72,7 @@ class ContractCheckerWhenContractAlreadyPatched(CeasefireLokiBaseTest):
             {'data': {'status': 'terminated'}}
         )
         self.checker.notify(self.message)
-        log_message = logger.info.call_args_list[0][0][0]
+        log_message = logger.info.call_args_list[1][0][0]
         assert 'already terminated' in log_message
 
 

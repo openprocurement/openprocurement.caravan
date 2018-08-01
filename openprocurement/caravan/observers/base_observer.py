@@ -4,6 +4,7 @@ from openprocurement.caravan.interfaces import (
     IObservable,
     IObserver,
 )
+from openprocurement.caravan.utils import LOGGER
 
 
 @implementer(IObservable)
@@ -21,8 +22,12 @@ class BaseObserverObservable(object):
 
     def notify(self, message):
         """Entrypoint of the observer"""
+        class_name = self.__class__.__name__
         if self._activate(message):
+            LOGGER.info("%s activated", class_name)
             self._run(message)
+        else:
+            LOGGER.info("%s not activated", class_name)
 
     def _run(self, message):
         """Holds main code of the observer
@@ -43,8 +48,15 @@ class BaseObserverObservable(object):
     def register_observer(self, observer):
         self._observers.append(observer)
 
+        observable_name = self.__class__.__name__
+        observer_name = observer.__class__.__name__
+        LOGGER.info("%s now watches %s", observer_name, observable_name)
+
     def _notify_observers(self, message):
+        emitter_name = self.__class__.__name__
         for observer in self._observers:
+            receiver_name = observer.__class__.__name__
+            LOGGER.info("%s notifies %s with message %s", emitter_name, receiver_name, message)
             observer.notify(message)
 
 

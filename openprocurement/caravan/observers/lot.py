@@ -27,11 +27,18 @@ class LotContractChecker(ObserverObservableWithClient):
             return True
 
     def _run(self, message):
+        LOGGER.info(
+            "Searching lot %s for contract related to %s contract",
+            message['lot_id'],
+            message['contract_id']
+        )
         try:
             lot_contract = self._check_lot_contract(message)
         except ResourceNotFound:
+            LOGGER.warning("Related contract not found")
             result = self._prepare_error_message(LOT_CONTRACT_NOT_FOUND, message)
         else:
+            LOGGER.info("Found %s contract", lot_contract.id)
             result = self._prepare_message(lot_contract, message)
         self._notify_observers(result)
 
@@ -66,6 +73,11 @@ class LotContractPatcher(ObserverObservableWithClient):
             return True
 
     def _run(self, message):
+        LOGGER.info(
+            "Patching lot contract %s of lot %s",
+            message['lot_contract_id'],
+            message['lot_id'],
+        )
         lot_conract = self._patch_lot_contract(message)
         out_message = self._prepare_message(lot_conract, message)
         self._notify_observers(out_message)
@@ -97,10 +109,10 @@ class LotContractAlreadyCompleteHandler(BaseObserverObservable):
 
     def _run(self, message):
         LOGGER.info(
-            'Contract {0} of lot {1} is already in terminal status'.format(
-                message['lot_contract_id'],
-                message['lot_id']
-            )
+            'Contract %s of lot %s is already in terminal status %s',
+            message['lot_contract_id'],
+            message['lot_id'],
+            message['lot_contract_status']
         )
         self._notify_observers(message)
 
