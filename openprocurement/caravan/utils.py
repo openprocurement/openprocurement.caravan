@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
+import argparse
 import json
-import yaml
 import logging
 import socket
-import argparse
+import yaml
 
 from couchdb import Server, Session
 from uuid import uuid4
 
-from logging import getLogger
 
-LOGGER = getLogger('openprocurement.caravan')
+logging.basicConfig()
+LOGGER = logging.getLogger('caravan')
+LOGGER.setLevel(logging.INFO)
 
 
 def db_url(protocol, host, port, login="", password=""):

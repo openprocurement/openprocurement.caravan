@@ -13,9 +13,7 @@ from openprocurement.caravan.observers.constants import (
 from openprocurement.caravan.observers.errors import (
     CONTRACT_NOT_FOUND,
 )
-from openprocurement.caravan.utils import (
-    LOGGER,
-)
+from openprocurement.caravan.utils import LOGGER
 
 
 class ContractChecker(ObserverObservableWithClient):
@@ -25,10 +23,12 @@ class ContractChecker(ObserverObservableWithClient):
             return True
 
     def _run(self, message):
+        LOGGER.info("Fetching contract %s", message['contract_id'])
         try:
             contract = self._check_contract(message)
         except ResourceNotFound:
             out_message = self._prepare_error_message(CONTRACT_NOT_FOUND, message)
+            LOGGER.info("Contract %s not found", message['contract_id'])
         else:
             out_message = self._prepare_message(contract, message)
         self._notify_observers(out_message)
@@ -63,6 +63,7 @@ class ContractPatcher(ObserverObservableWithClient):
             return True
 
     def _run(self, message):
+        LOGGER.info("Patching contract %s", message['contract_id'])
         patched_contract = self._patch_contract(message)
         out_message = self._prepare_message(patched_contract, message)
         self._notify_observers(out_message)
