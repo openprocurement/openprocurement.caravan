@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import logging.config
 
 from munch import munchify
 
@@ -15,6 +16,7 @@ def app_config(config_filename=None):
 
     if config_filename:
         file_data = load_file(config_filename)
+        logging.config.dictConfig(file_data)
         kv.update(file_data)
 
     return munchify(kv)
