@@ -29,4 +29,6 @@ lots:
         token: "caravan"
     test:
         token_with_create_lot_permission: "broker1"
+logging:
+    version: 1.0
 ...
