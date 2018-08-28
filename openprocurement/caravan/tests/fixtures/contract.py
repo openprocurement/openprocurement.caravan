@@ -1,12 +1,22 @@
 # -*- coding: utf-8 -*-
 import iso8601
 
+from copy import deepcopy
 from datetime import timedelta
+from openprocurement.api.tests.helpers import (
+    fake_docservice_url,
+)
+from openprocurement.caravan.tests.constants import (
+    MILESTONE_TYPES_NEED_DOCUMENT_TO_MET,
+)
 from openprocurement.caravan.utils import (
     search_list_with_dicts,
 )
 from openprocurement.caravan.tests.fixtures.contract_data import (
     contract_create_data,
+)
+from openprocurement.caravan.tests.fixtures.document_data import (
+    test_document_data,
 )
 
 
@@ -17,13 +27,35 @@ def create_contract(client, data=None):
     return client.create_contract(data)
 
 
-def make_milestone_met(contract_id, milestone_id, token, client):
+def upload_document_to_milestone(contract_id, milestone_id, token, client, dockey, **kwargs):
+    doc_url = fake_docservice_url(dockey)
+    doc_data = deepcopy(test_document_data)
+    doc_data.update({
+        'relatedItem': milestone_id,
+        'documentOf': 'milestone',
+        'url': doc_url
+    })
+    if kwargs.get('data'):
+        doc_data.update(kwargs['data'])
+    wrapped_data = {'data': doc_data}
+    client.post_document(contract_id, token, wrapped_data)
+
+
+def make_milestone_met(contract_id, milestone_id, token, client, **kwargs):
     contract = client.get_contract(contract_id)
     target_milestone = search_list_with_dicts(
         contract.data.milestones,
         'id',
         milestone_id
     )
+    if target_milestone.type in MILESTONE_TYPES_NEED_DOCUMENT_TO_MET:
+        upload_document_to_milestone(
+            contract_id, 
+            milestone_id,
+            token,
+            client,
+            kwargs['dockey'],
+        )
     due_date = iso8601.parse_date(target_milestone.dueDate)
     date_met = due_date - timedelta(days=1)
     client.patch_milestone(
@@ -42,14 +74,14 @@ def active_payment_contract(contract_id, token, client):
     )
 
 
-def p_terminated_contract(client):
+def p_terminated_contract(client, **kwargs):
     create_response = create_contract(client)
     contract_id = create_response.data.id
     token = create_response.access.token
 
     response = active_payment_contract(contract_id, token, client)
     for milestone in response.data.milestones:
-        make_milestone_met(contract_id, milestone.id, token, client)
+        make_milestone_met(contract_id, milestone.id, token, client, dockey=kwargs['dockey'])
     return client.get_contract(contract_id)
 
 
@@ -69,6 +101,7 @@ def p_unsuccessful_contract(client):
 
 
 def interconnect_contract_with_lot(contract_id, lot_id, db):
+    import ipdb; ipdb.set_trace()
     contract = db[contract_id]
     lot = db[lot_id]
 

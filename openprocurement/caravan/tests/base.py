@@ -29,6 +29,8 @@ class CeasefireLokiBaseTest(TestCase):
 
         self.db = get_db(db_config.name, self.db_server)
 
+        self.dockey = self.config.test.ds_dockey
+
         contracting_api = self.config.contracting.api
 
         self.contracting_client_with_create = ContractingClient(

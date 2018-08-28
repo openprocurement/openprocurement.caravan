@@ -9,7 +9,7 @@ contracting:
             - 1
             - 2
             - 3
-        name: "tests"
+        name: "contracts"
         protocol: "http"
         host: "localhost"
         port: 5984
@@ -29,6 +29,9 @@ lots:
         token: "caravan"
     test:
         token_with_create_lot_permission: "broker1"
+test:
+    # from op.api/tests/base.py
+    ds_dockey: "c1d4ce58057d33bc324a5e6b4c1cc598da66233e90e5f52e68775a0b262bb32f"
 logging:
     version: 1.0
 ...
