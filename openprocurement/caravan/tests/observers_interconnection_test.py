@@ -53,7 +53,7 @@ class ContractCheckerWhenContractAlreadyPatched(CeasefireLokiBaseTest):
 
     def setUp(self):
         super(ContractCheckerWhenContractAlreadyPatched, self).setUp()
-        self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create)
+        self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create, dockey=self.dockey)
 
         self.checker = ContractChecker(self.contracting_client)
         not_found_handler = ContractNotFoundHandler()

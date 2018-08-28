@@ -101,7 +101,6 @@ def p_unsuccessful_contract(client):
 
 
 def interconnect_contract_with_lot(contract_id, lot_id, db):
-    import ipdb; ipdb.set_trace()
     contract = db[contract_id]
     lot = db[lot_id]
 

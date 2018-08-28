@@ -20,7 +20,7 @@ class ContractCheckerTest(CeasefireLokiBaseTest):
 
     def setUp(self):
         super(ContractCheckerTest, self).setUp()
-        self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create)
+        self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create, dockey=self.dockey)
 
         self.checker = ContractChecker(self.contracting_client)
         self.message = {
