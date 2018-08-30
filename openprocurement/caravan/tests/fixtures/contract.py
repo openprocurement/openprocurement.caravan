@@ -50,7 +50,7 @@ def make_milestone_met(contract_id, milestone_id, token, client, **kwargs):
     )
     if target_milestone.type in MILESTONE_TYPES_NEED_DOCUMENT_TO_MET:
         upload_document_to_milestone(
-            contract_id, 
+            contract_id,
             milestone_id,
             token,
             client,
