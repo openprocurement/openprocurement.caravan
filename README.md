@@ -35,6 +35,11 @@ The main reason of caravan's existance is to interconnect web-resources in "if t
 
 ### Conceptions
 
-To do it's work, caravan uses a set of atomic actions called `observers`, organized into a network called `runner`.
+To do its work, caravan uses a set of atomic actions called `observers`, organized into a network called `runner`.
 This network is in charge of data processing. Such approach allows to reuse code and adapt to wide range of
 interconnected resources with minimal changes to the present code.
+
+Observers are classes that implement [`Observer`](https://en.wikipedia.org/wiki/Observer_pattern) pattern.
+Thank to it, it's becomes possible to organize atomic actions, incapsulated in observers, into the runner.
+Runner, in turn, is able to setup itself by interconnecting observers into desirable network, and therefore
+control it.
