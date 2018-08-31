@@ -11,12 +11,12 @@ from openprocurement.caravan.observers.constants import (
     LOT_CONTRACT_TERMINAL_STATUSES,
 )
 from openprocurement.caravan.utils import (
-    LOGGER,
     search_lot_contract_by_related_contract,
 )
 from openprocurement.caravan.observers.errors import (
     LOT_CONTRACT_NOT_FOUND,
 )
+from openprocurement.caravan.log import LOGGER
 
 
 class LotContractChecker(ObserverObservableWithClient):

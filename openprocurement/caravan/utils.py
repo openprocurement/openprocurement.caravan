@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 import argparse
 import json
-import logging
 import socket
 import yaml
 
 from couchdb import Server, Session
 from uuid import uuid4
 
-
-logging.basicConfig()
-LOGGER = logging.getLogger('caravan')
-LOGGER.setLevel(logging.INFO)
+from openprocurement.caravan.log import LOGGER
 
 
 def db_url(protocol, host, port, login="", password=""):
@@ -33,12 +29,12 @@ def connect_to_db_server(url, retries, check_connection=True):
         try:
             server.create(db_name)
         except socket.error as exc:
-            logging.error(
+            LOGGER.error(
                 "Cannot use DB due to socket error (maybe DB isn't working): {0}".format(exc.message)
             )
             return None
         except Exception:
-            logging.error("Cannot use DB due to some error")
+            LOGGER.error("Cannot use DB due to some error")
             return None
         else:
             server.delete(db_name)

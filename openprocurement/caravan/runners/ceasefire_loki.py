@@ -31,7 +31,7 @@ from openprocurement_client.resources.contracts import (
 from openprocurement_client.resources.lots import (
     LotsClient,
 )
-from openprocurement.caravan.utils import LOGGER
+from openprocurement.caravan.log import LOGGER
 
 
 class CeasefireLokiRunner(BaseRunner):

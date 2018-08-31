@@ -32,6 +32,4 @@ lots:
 test:
     # from op.api/tests/base.py
     dockey: "c1d4ce58057d33bc324a5e6b4c1cc598da66233e90e5f52e68775a0b262bb32f"
-logging:
-    version: 1.0
 ...
