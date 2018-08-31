@@ -32,12 +32,20 @@ class LotContractChecker(ObserverObservableWithClient):
             message['lot_id'],
             message['contract_id']
         )
+        lot_contract = None
+
         try:
             lot_contract = self._check_lot_contract(message)
         except ResourceNotFound:
-            LOGGER.warning("Related contract not found")
+            LOGGER.warning("Related contract not found: HTTP 404 error on the Lot resource")
             result = self._prepare_error_message(LOT_CONTRACT_NOT_FOUND, message)
         else:
+            if lot_contract is None:  # contract not found
+                LOGGER.warning(
+                    "Related contract not found: Lot model has not contract related to %s",
+                    message['contract_id'],
+                )
+                return
             LOGGER.info("Found %s contract", lot_contract.id)
             result = self._prepare_message(lot_contract, message)
         self._notify_observers(result)
