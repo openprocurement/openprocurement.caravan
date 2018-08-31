@@ -31,7 +31,7 @@ from openprocurement_client.resources.contracts import (
 from openprocurement_client.resources.lots import (
     LotsClient,
 )
-from openprocurement.caravan.utils import LOGGER
+from openprocurement.caravan.log import LOGGER
 
 
 class CeasefireLokiRunner(BaseRunner):
@@ -111,6 +111,9 @@ def main():
         config.contracting.db.password,
         config.contracting.db.name,
     )
+    if db is None:
+        LOGGER.info("Gracefully exiting.")
+        return
     LOGGER.info("Connected to DB")
 
     LOGGER.info("Init clients")

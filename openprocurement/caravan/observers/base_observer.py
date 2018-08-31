@@ -4,7 +4,7 @@ from openprocurement.caravan.interfaces import (
     IObservable,
     IObserver,
 )
-from openprocurement.caravan.utils import LOGGER
+from openprocurement.caravan.log import LOGGER
 
 
 @implementer(IObservable)

@@ -11,12 +11,12 @@ from openprocurement.caravan.observers.constants import (
     LOT_CONTRACT_TERMINAL_STATUSES,
 )
 from openprocurement.caravan.utils import (
-    LOGGER,
     search_lot_contract_by_related_contract,
 )
 from openprocurement.caravan.observers.errors import (
     LOT_CONTRACT_NOT_FOUND,
 )
+from openprocurement.caravan.log import LOGGER
 
 
 class LotContractChecker(ObserverObservableWithClient):
@@ -111,7 +111,7 @@ class LotContractAlreadyCompleteHandler(BaseObserverObservable):
 
     def _activate(self, message):
         if (
-            message['lot_contract_status'] in LOT_CONTRACT_TERMINAL_STATUSES
+            message.get('lot_contract_status') in LOT_CONTRACT_TERMINAL_STATUSES
         ):
             return True
 
@@ -137,4 +137,6 @@ class LotContractNotFoundHandler(BaseObserverObservable):
         LOGGER.error(
             "Lot {0} or some it's subresource {1} not found".format(
                 message['lot_id'],
-                message['lot_contract_id']))
+                message.get('lot_contract_id', '<Not Found>')
+            )
+        )

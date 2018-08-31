@@ -13,7 +13,7 @@ from openprocurement.caravan.observers.constants import (
 from openprocurement.caravan.observers.errors import (
     CONTRACT_NOT_FOUND,
 )
-from openprocurement.caravan.utils import LOGGER
+from openprocurement.caravan.log import LOGGER
 
 
 class ContractChecker(ObserverObservableWithClient):
