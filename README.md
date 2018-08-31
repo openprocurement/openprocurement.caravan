@@ -1,6 +1,6 @@
 # Caravan
 
-[![CodeFactor](https://www.codefactor.io/repository/github/bdmbdsm/openprocurement.caravan/badge/dev)](https://www.codefactor.io/repository/github/bdmbdsm/openprocurement.caravan/overview/dev)
+[![CodeFactor](https://www.codefactor.io/repository/github/openprocurement/openprocurement.caravan/badge)](https://www.codefactor.io/repository/github/openprocurement/openprocurement.caravan)
 
 The purpose of caravan is to interconnect web resources in "if this than that" manner. Also the project was built with extensibility and simplicity in mind, so you're welcome to contribute.
 
