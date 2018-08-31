@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import logging
+import logging.config
 
 
-_log_conf_dict = {
-    'version': '1'
-}
+_format = '%(levelname)s: %(message)s'
+# other attributes of log record are described here:
+# https://docs.python.org/2/library/logging.html#logrecord-attributes
 
-logging.basicConfig()
+logging.basicConfig(format=_format)
 LOGGER = logging.getLogger('caravan')
 LOGGER.setLevel(logging.INFO)
