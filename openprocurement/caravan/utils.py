@@ -30,7 +30,7 @@ def connect_to_db_server(url, retries, check_connection=True):
             server.create(db_name)
         except socket.error as exc:
             LOGGER.error(
-                "Cannot use DB due to socket error (maybe DB isn't working): {0}".format(exc.message)
+                "Cannot use DB due to socket error"
             )
             return None
         except Exception:

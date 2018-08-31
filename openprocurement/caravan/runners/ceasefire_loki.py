@@ -111,6 +111,9 @@ def main():
         config.contracting.db.password,
         config.contracting.db.name,
     )
+    if db is None:
+        LOGGER.info("Gracefully exiting.")
+        return
     LOGGER.info("Connected to DB")
 
     LOGGER.info("Init clients")
