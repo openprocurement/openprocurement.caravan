@@ -28,7 +28,7 @@ def connect_to_db_server(url, retries, check_connection=True):
         db_name = ''.join(('test_', uuid4().hex))
         try:
             server.create(db_name)
-        except socket.error as exc:
+        except socket.error:
             LOGGER.error(
                 "Cannot use DB due to socket error"
             )
