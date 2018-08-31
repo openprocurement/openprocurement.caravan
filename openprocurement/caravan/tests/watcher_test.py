@@ -16,7 +16,7 @@ class WatcherUpdateTest(CeasefireLokiBaseTest):
 
     def setUp(self):
         super(WatcherUpdateTest, self).setUp()
-        p_terminated_contract(self.contracting_client_with_create)
+        p_terminated_contract(self.contracting_client_with_create, dockey=self.dockey)
         p_unsuccessful_contract(self.contracting_client_with_create)
 
     def test_update_ok(self):
