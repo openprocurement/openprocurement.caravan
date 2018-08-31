@@ -16,7 +16,7 @@ class ContractPatcherTest(CeasefireLokiBaseTest):
 
     def setUp(self):
         super(ContractPatcherTest, self).setUp()
-        self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create)
+        self.p_terminated_contract = p_terminated_contract(self.contracting_client_with_create, dockey=self.dockey)
 
         self.patcher = ContractPatcher(self.contracting_client)
 

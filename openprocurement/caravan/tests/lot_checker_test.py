@@ -20,7 +20,7 @@ class LotCheckerTest(CeasefireLokiBaseTest):
 
     def setUp(self):
         super(LotCheckerTest, self).setUp()
-        self.contract = p_terminated_contract(self.contracting_client_with_create)
+        self.contract = p_terminated_contract(self.contracting_client_with_create, dockey=self.dockey)
         self.lot_id = active_contracting_lot(self.contract.data.id, self.db)
         lot_contract = interconnect_contract_with_lot(
             self.contract.data.id,
