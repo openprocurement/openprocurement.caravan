@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import logging.config
 
 from munch import munchify
 
@@ -12,12 +13,13 @@ TESTS_DIR = os.path.join(BASE_DIR, 'tests')
 TEST_DATA_DIR = os.path.join(TESTS_DIR, 'data')
 
 
-# logging.config.dictConfig(config_dict['logging'])
 def app_config(config_filename=None):
     kv = {}
 
     if config_filename:
         file_data = load_file(config_filename)
         kv.update(file_data)
+
+    logging.config.dictConfig(kv.get('logging', {}))
 
     return munchify(kv)

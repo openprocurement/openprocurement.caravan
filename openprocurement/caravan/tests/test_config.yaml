@@ -32,4 +32,25 @@ lots:
 test:
     # from op.api/tests/base.py
     dockey: "c1d4ce58057d33bc324a5e6b4c1cc598da66233e90e5f52e68775a0b262bb32f"
+
+logging:
+  version: 1
+
+  formatters:
+    simple:
+      format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: simple
+      stream: ext://sys.stdout
+
+  loggers:
+    '':
+      handlers: [console]
+      propagate: no
+      level: INFO
+
 ...
