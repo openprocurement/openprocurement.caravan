@@ -3,11 +3,13 @@ import argparse
 import json
 import socket
 import yaml
+import logging
 
 from couchdb import Server, Session
 from uuid import uuid4
 
-from openprocurement.caravan.log import LOGGER
+
+LOGGER = logging.getLogger('caravan')
 
 
 def db_url(protocol, host, port, login="", password=""):

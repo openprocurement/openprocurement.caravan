@@ -5,6 +5,7 @@ from random import randint
 from openprocurement.caravan.utils import (
     connect_to_db,
     parse_args,
+    LOGGER
 )
 from openprocurement.caravan.config import app_config
 from openprocurement.caravan.watchers.contracts_watcher import (
@@ -31,7 +32,6 @@ from openprocurement_client.resources.contracts import (
 from openprocurement_client.resources.lots import (
     LotsClient,
 )
-from openprocurement.caravan.log import LOGGER
 
 
 class CeasefireLokiRunner(BaseRunner):

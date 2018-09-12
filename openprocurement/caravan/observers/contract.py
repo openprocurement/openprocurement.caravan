@@ -13,7 +13,13 @@ from openprocurement.caravan.observers.constants import (
 from openprocurement.caravan.observers.errors import (
     CONTRACT_NOT_FOUND,
 )
-from openprocurement.caravan.log import LOGGER
+from openprocurement.caravan.utils import LOGGER
+from openprocurement.caravan.constants import (
+    PATCH_CONTRACT_MSG,
+    TERMINATED_CONTRACT_MSG,
+    CONTRACT_NOT_FOUND_MSG,
+    SEARCH_CONTRACT_MSG
+)
 
 
 class ContractChecker(ObserverObservableWithClient):
@@ -23,12 +29,18 @@ class ContractChecker(ObserverObservableWithClient):
             return True
 
     def _run(self, message):
-        LOGGER.info("Fetching contract %s", message['contract_id'])
+        LOGGER.info(
+            "Fetching contract %s", message['contract_id'],
+            extra={'MESSAGE_ID': SEARCH_CONTRACT_MSG}
+        )
         try:
             contract = self._check_contract(message)
         except ResourceNotFound:
             out_message = self._prepare_error_message(CONTRACT_NOT_FOUND, message)
-            LOGGER.info("Contract %s not found", message['contract_id'])
+            LOGGER.info(
+                "Contract %s not found", message['contract_id'],
+                extra={'MESSAGE_ID': CONTRACT_NOT_FOUND_MSG}
+            )
         else:
             out_message = self._prepare_message(contract, message)
         self._notify_observers(out_message)
@@ -63,7 +75,10 @@ class ContractPatcher(ObserverObservableWithClient):
             return True
 
     def _run(self, message):
-        LOGGER.info("Patching contract %s", message['contract_id'])
+        LOGGER.info(
+            "Patching contract %s", message['contract_id'],
+            extra={'MESSAGE_ID': PATCH_CONTRACT_MSG}
+        )
         patched_contract = self._patch_contract(message)
         out_message = self._prepare_message(patched_contract, message)
         self._notify_observers(out_message)
@@ -108,4 +123,7 @@ class ContractAlreadyTerminatedHandler(BaseObserverObservable):
             return True
 
     def _run(self, message):
-        LOGGER.info("Contract {0} already terminated".format(message['contract_id']))
+        LOGGER.info(
+            "Contract {0} already terminated".format(message['contract_id']),
+            extra={'MESSAGE_ID': TERMINATED_CONTRACT_MSG}
+        )

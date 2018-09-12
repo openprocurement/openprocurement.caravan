@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import signal
-from openprocurement.caravan.log import LOGGER
+from openprocurement.caravan.utils import LOGGER
 
 
 class GracefulKiller(object):

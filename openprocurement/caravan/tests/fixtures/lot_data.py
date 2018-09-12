@@ -2,8 +2,8 @@
 
 
 raw_active_contracting_lot = {
-    "assets": [
-        "0e9c75f9ef084b2f971cb57ed3402a42"
+    "relatedProcesses": [
+        {"relatedProcessID": "0e9c75f9ef084b2f971cb57ed3402a42"}
     ],
     "auctions": [
         {

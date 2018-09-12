@@ -11,12 +11,16 @@ from openprocurement.caravan.observers.constants import (
     LOT_CONTRACT_TERMINAL_STATUSES,
 )
 from openprocurement.caravan.utils import (
-    search_lot_contract_by_related_contract,
+    search_lot_contract_by_related_contract, LOGGER
 )
 from openprocurement.caravan.observers.errors import (
     LOT_CONTRACT_NOT_FOUND,
 )
-from openprocurement.caravan.log import LOGGER
+from openprocurement.caravan.constants import (
+    PATCH_LOT_CONTRACT_MSG,
+    LOT_OR_CONTRACT_NOT_FOUND_MSG,
+    SEARCH_LOT_CONTRACT_MSG
+)
 
 
 class LotContractChecker(ObserverObservableWithClient):
@@ -30,7 +34,8 @@ class LotContractChecker(ObserverObservableWithClient):
         LOGGER.info(
             "Searching lot %s for contract related to %s contract",
             message['lot_id'],
-            message['contract_id']
+            message['contract_id'],
+            extra={'MESSAGE_ID': SEARCH_LOT_CONTRACT_MSG}
         )
         lot_contract = None
 
@@ -85,6 +90,7 @@ class LotContractPatcher(ObserverObservableWithClient):
             "Patching lot contract %s of lot %s",
             message['lot_contract_id'],
             message['lot_id'],
+            extra={'MESSAGE_ID': PATCH_LOT_CONTRACT_MSG}
         )
         lot_conract = self._patch_lot_contract(message)
         out_message = self._prepare_message(lot_conract, message)
@@ -138,5 +144,6 @@ class LotContractNotFoundHandler(BaseObserverObservable):
             "Lot {0} or some it's subresource {1} not found".format(
                 message['lot_id'],
                 message.get('lot_contract_id', '<Not Found>')
-            )
+            ),
+            extra={'MESSAGE_ID': LOT_OR_CONTRACT_NOT_FOUND_MSG}
         )
