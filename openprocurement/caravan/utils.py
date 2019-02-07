@@ -8,6 +8,8 @@ import logging
 from couchdb import Server, Session
 from uuid import uuid4
 
+from openprocurement.api.utils.searchers import search_list_with_dicts
+
 
 LOGGER = logging.getLogger('caravan')
 
