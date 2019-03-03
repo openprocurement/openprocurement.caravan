@@ -9,7 +9,7 @@ from openprocurement.api.tests.helpers import (
 from openprocurement.caravan.tests.constants import (
     MILESTONE_TYPES_NEED_DOCUMENT_TO_MET,
 )
-from openprocurement.caravan.utils import (
+from openprocurement.api.utils.searchers import (
     search_list_with_dicts,
 )
 from openprocurement.caravan.tests.fixtures.contract_data import (
